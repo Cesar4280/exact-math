@@ -1,0 +1,61 @@
+{
+  "name": "@cesar4280/exact-math",
+  "version": "0.1.0",
+  "description": "Exact rational arithmetic library (BigInt-backed) for business logic that cannot tolerate floating-point error.",
+  "type": "module",
+  "main": "src/math/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/math/index.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "src",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "packageManager": "pnpm@11.18.0+sha512.33d83c77da82f49fba836925c6f1b841181ec3132b670639bd012f7075f5c7cf634c5f870147c19aae7478fac01df09d8892e880454896edd23ee9b33757563c",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "example:frequency-table": "node examples/frequency-table.js",
+    "example:weather-stats": "node examples/weather-stats.js",
+    "example:weather-stats-live": "node examples/weather-stats-live.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build:types": "tsc",
+    "prepublishOnly": "pnpm test && pnpm format:check && pnpm build:types"
+  },
+  "keywords": [
+    "rational",
+    "fraction",
+    "bigint",
+    "exact-arithmetic",
+    "arbitrary-precision",
+    "decimal",
+    "math"
+  ],
+  "author": {
+    "name": "Cesar J. Fajardo Ortiz",
+    "url": "https://github.com/Cesar4280"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cesar4280/exact-math.git"
+  },
+  "homepage": "https://github.com/Cesar4280/exact-math#readme",
+  "bugs": {
+    "url": "https://github.com/Cesar4280/exact-math/issues"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.3"
+  }
+}

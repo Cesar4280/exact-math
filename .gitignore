@@ -1,0 +1,7 @@
+node_modules
+types
+*.log
+
+# Local tooling config, not part of the published library
+.mcp.json
+.claude/
