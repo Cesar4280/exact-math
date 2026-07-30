@@ -30,7 +30,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build:types": "tsc",
-    "prepublishOnly": "pnpm test && pnpm format:check && pnpm build:types"
+    "prepack": "pnpm build:types",
+    "prepublishOnly": "pnpm test && pnpm format:check"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "rational",
