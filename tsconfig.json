@@ -4,6 +4,7 @@
     "checkJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
+    "rootDir": "./src/math",
     "outDir": "types",
     "module": "nodenext",
     "moduleResolution": "nodenext",
