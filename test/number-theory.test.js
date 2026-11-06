@@ -32,6 +32,34 @@ test("lcm ignora el signo", () => {
   assert.equal(lcm(12n, -18n), 36n);
 });
 
+test("gcd y lcm coinciden con una búsqueda por fuerza bruta (exhaustivo en -30..30)", () => {
+  // Oráculos independientes de la implementación (Euclides, y lcm = a / gcd · b): el
+  // mayor k que divide a ambos, y el menor múltiplo positivo de |a| que también lo es
+  // de b. Recorrer todos los pares cubre signos, ceros, coprimos y conmutatividad.
+  const abs = (x) => (x < 0n ? -x : x);
+
+  function bruteForceGcd(a, b) {
+    if (a === 0n && b === 0n) return 0n;
+    for (let k = abs(a) > abs(b) ? abs(a) : abs(b); ; k--) {
+      if (a % k === 0n && b % k === 0n) return k;
+    }
+  }
+
+  function bruteForceLcm(a, b) {
+    if (a === 0n || b === 0n) return 0n;
+    for (let m = abs(a); ; m += abs(a)) {
+      if (m % b === 0n) return m;
+    }
+  }
+
+  for (let a = -30n; a <= 30n; a++) {
+    for (let b = -30n; b <= 30n; b++) {
+      assert.equal(gcd(a, b), bruteForceGcd(a, b), `gcd(${a}, ${b})`);
+      assert.equal(lcm(a, b), bruteForceLcm(a, b), `lcm(${a}, ${b})`);
+    }
+  }
+});
+
 test("gcd(a,b) * lcm(a,b) === a * b (propiedad fundamental)", () => {
   for (const [a, b] of [
     [12n, 18n],
