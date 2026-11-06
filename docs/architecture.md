@@ -14,9 +14,11 @@ be introduced and drift out of sync. Centralizing in one class means:
   makes `equals()` a cheap structural comparison instead of a numeric one;
 - there is exactly one rounding algorithm (`toDecimal()`), so "how do we go from exact to display
   precision" is answered once, not reimplemented per call site;
-- validation of inputs (rejecting `NaN`/`Infinity`/non-integers/`null`/`undefined`, requiring
-  operands to already be `Rational` instances) happens in one constructor and one `assertRational`
-  helper, so it can't be silently skipped by going through a different entry point.
+- validation of inputs (rejecting `NaN`/`Infinity`/non-integers/`null`/`undefined`, integer
+  `number`s beyond `±Number.MAX_SAFE_INTEGER` — which may already have been rounded before they
+  arrive, so their exact value is unknowable — and requiring operands to already be `Rational`
+  instances) happens in one constructor and one `assertRational` helper, so it can't be silently
+  skipped by going through a different entry point.
 
 `number-theory.js` backs both of the library's two size-control optimizations: `multiply()` cross-cancels
 common factors (`gcd(a.n, b.d)`, `gcd(b.n, a.d)`) before multiplying, and `add()`/`subtract()` use

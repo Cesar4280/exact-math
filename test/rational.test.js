@@ -303,6 +303,23 @@ test("rechaza NaN, Infinity, null, undefined y cadenas inválidas", () => {
   assert.throws(() => new Rational(1.5), InvalidNumberError);
 });
 
+test("rechaza enteros number fuera del rango seguro (su valor exacto ya se perdió)", () => {
+  // 2 ** 53 + 1 no es representable: el literal 9007199254740993 llega como ...992.
+  assert.throws(() => new Rational(2 ** 53), InvalidNumberError);
+  assert.throws(() => new Rational(-(2 ** 53)), InvalidNumberError);
+  assert.throws(() => new Rational(1e300), InvalidNumberError);
+  assert.throws(() => new Rational(1n, 2 ** 53), InvalidNumberError);
+  assert.throws(() => Rational.fromInt(2 ** 53), InvalidNumberError);
+  assert.throws(() => new Rational(2n).pow(2 ** 53), InvalidNumberError);
+});
+
+test("acepta los extremos del rango seguro, y valores mayores como bigint o string", () => {
+  assert.equal(new Rational(Number.MAX_SAFE_INTEGER).toString(), "9007199254740991/1");
+  assert.equal(new Rational(Number.MIN_SAFE_INTEGER).toString(), "-9007199254740991/1");
+  assert.equal(new Rational(9007199254740993n).toString(), "9007199254740993/1");
+  assert.equal(new Rational("9007199254740993").toString(), "9007199254740993/1");
+});
+
 test("operaciones exigen instancias de Rational, no números crudos", () => {
   const r = new Rational(1n, 2n);
   assert.throws(() => r.add(2), InvalidNumberError);

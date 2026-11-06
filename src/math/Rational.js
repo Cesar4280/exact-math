@@ -6,10 +6,17 @@ import {
   PrecisionLimitError
 } from "./errors.js";
 
+/** An optionally signed run of ASCII decimal digits: the only integer-string grammar accepted. */
+const INTEGER_STRING = /^[+-]?\d+$/;
+
 /**
  * Coerces a bigint / safe integer number / integer string into a BigInt,
  * rejecting everything a real-money calculation must never silently accept:
- * NaN, Infinity, non-integers, null, undefined, objects.
+ * NaN, Infinity, non-integers, null, undefined, objects, and integer numbers
+ * beyond ±Number.MAX_SAFE_INTEGER. Those last ones are rejected because by the
+ * time such a value reaches this function it may already have been rounded
+ * (the literal 9007199254740993 arrives as 9007199254740992), and there is no
+ * way to tell; bigints and integer strings carry any size exactly.
  *
  * @param {bigint|number|string} value
  * @param {string} label used in the error message
@@ -19,9 +26,11 @@ function toBigInt(value, label) {
   if (typeof value === "bigint") return value;
 
   if (typeof value === "number") {
-    if (!Number.isInteger(value)) {
+    if (!Number.isSafeInteger(value)) {
       throw new InvalidNumberError(
-        `${label} must be an integer (got NaN, Infinity, or a non-integer number: ${value}).`
+        `${label} must be a safe integer number (got NaN, Infinity, a non-integer, or an ` +
+          `integer beyond ±Number.MAX_SAFE_INTEGER that a number cannot hold exactly: ${value}). ` +
+          `Pass a bigint or an integer string for larger values.`
       );
     }
     return BigInt(value);
@@ -29,7 +38,7 @@ function toBigInt(value, label) {
 
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!/^[+-]?\d+$/.test(trimmed)) {
+    if (!INTEGER_STRING.test(trimmed)) {
       throw new InvalidNumberError(`${label} must be an integer string, received "${value}".`);
     }
     return BigInt(trimmed);
