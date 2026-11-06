@@ -155,6 +155,45 @@ test("toDecimal con scale 0 redondea a entero", () => {
   assert.equal(r.toDecimal(0), "4");
 });
 
+test("toDecimal nunca devuelve '-0' cuando un negativo redondea a cero", () => {
+  assert.equal(new Rational(-1n, 1000n).toDecimal(2), "0"); // -0.001
+  assert.equal(new Rational(-4n, 1000n).toDecimal(2), "0"); // -0.004
+  assert.equal(new Rational(-1n, 3n).toDecimal(0), "0"); // -0.333...
+
+  // El signo se conserva cuando el redondeo no llega a cero.
+  assert.equal(new Rational(-5n, 1000n).toDecimal(2), "-0.01"); // -0.005, half-up
+  assert.equal(new Rational(-1n, 2n).toDecimal(0), "-1"); // -0.5, half-up
+});
+
+test("toDecimal: un negativo es '-' + su magnitud, o '0' si redondea a cero (exhaustivo por scale)", () => {
+  // Para cada scale s se prueban los valores x = n / (d · 10^s), con 1 <= n <= 100 y
+  // 1 <= d <= 40. Escalar el denominador con s hace que x · 10^s = n/d sea el mismo rango
+  // en todas las escalas, así que la frontera de redondeo a cero cae dentro en cada una
+  // (con un d fijo, en scale >= 2 haría falta d > 200·n y no se probaría ningún caso).
+  // Exhaustivo en vez de aleatorio para que un fallo sea siempre reproducible.
+  for (let scale = 0; scale <= 3; scale++) {
+    const unit = 10n ** BigInt(scale);
+
+    for (let d = 1n; d <= 40n; d++) {
+      const denominator = d * unit;
+
+      for (let n = 1n; n <= 100n; n++) {
+        const positive = new Rational(n, denominator);
+        const magnitude = positive.toDecimal(scale);
+        const label = `${n}/${denominator} a scale ${scale}`;
+
+        // Oráculo independiente de toDecimal: half-up lleva x a cero sii x · 10^s < 1/2,
+        // es decir, sii 2n < d. Fija la frontera exacta (incluido el empate n/d = 1/2).
+        assert.equal(magnitude === "0", 2n * n < d, `frontera de redondeo de ${label}`);
+
+        // Simetría: -x es "-" + la magnitud de x, salvo cuando esta es "0" (nunca "-0").
+        const expected = magnitude === "0" ? "0" : `-${magnitude}`;
+        assert.equal(positive.negate().toDecimal(scale), expected, `-${label}`);
+      }
+    }
+  }
+});
+
 test("decimalExpansionType: terminating cuando el denominador solo tiene factores 2 y 5", () => {
   assert.equal(new Rational(1n, 2n).decimalExpansionType(), "terminating");
   assert.equal(new Rational(3n, 8n).decimalExpansionType(), "terminating");

@@ -337,6 +337,9 @@ export class Rational {
    * at scale 3) correctly, unlike rounding the last digit of a
    * digit-by-digit expansion, which does not propagate the carry.
    *
+   * The sign is decided *after* rounding: a negative value whose magnitude
+   * rounds to zero (e.g. -0.001 at scale 2) yields `"0"`, never `"-0"`.
+   *
    * Complexity: O(scale) for the BigInt exponentiation and one division.
    *
    * @param {number} [scale=5] number of decimal digits to keep
@@ -347,8 +350,8 @@ export class Rational {
       throw new InvalidNumberError(`scale must be a non-negative integer, received ${scale}.`);
     }
 
-    const sign = this.#n < 0n ? "-" : "";
-    const n = this.#n < 0n ? -this.#n : this.#n;
+    const isNegative = this.#n < 0n;
+    const n = isNegative ? -this.#n : this.#n;
 
     const factor = 10n ** BigInt(scale);
     const scaledNumerator = n * factor;
@@ -358,6 +361,7 @@ export class Rational {
 
     if (remainder * 2n >= this.#d) quotient += 1n;
 
+    const sign = isNegative && quotient !== 0n ? "-" : "";
     const integerPart = quotient / factor;
     let fractionPart = (quotient % factor).toString().padStart(scale, "0");
     fractionPart = fractionPart.replace(/0+$/, "");
