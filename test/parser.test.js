@@ -60,3 +60,18 @@ test("parse auto-detecta el formato", () => {
   assert.equal(parse("25%").toString(), "1/4");
   assert.equal(parse("3/4").toString(), "3/4");
 });
+
+test("parse ignora los espacios exteriores en todos los formatos", () => {
+  assert.equal(parse("  -42  ").toString(), "-42/1");
+  assert.equal(parse("  3.25  ").toString(), "13/4");
+  assert.equal(parse("  25%  ").toString(), "1/4");
+  assert.equal(parse("  3/4  ").toString(), "3/4");
+  assert.equal(parse(".5").toString(), "1/2"); // la parte entera es opcional
+});
+
+test("parse rechaza con ParseError las entradas inválidas", () => {
+  for (const text of ["", "   ", "abc", "1.2.3", "25%%", ".", "%", "1/2%", "1e3", "5."]) {
+    assert.throws(() => parse(text), ParseError, `"${text}"`);
+  }
+  assert.throws(() => parse(42), ParseError);
+});

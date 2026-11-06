@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { Rational } from "../src/math/Rational.js";
 import { toJSON, fromJSON } from "../src/math/Serializer.js";
 import { format } from "../src/math/formatter.js";
-import { InvalidNumberError } from "../src/math/errors.js";
+import { DivisionByZeroError, InvalidNumberError, ParseError } from "../src/math/errors.js";
 
 test("toJSON / fromJSON hacen round-trip exacto", () => {
   const r = new Rational(355n, 113n);
@@ -21,6 +21,25 @@ test("nunca serializa como number", () => {
   const json = JSON.stringify(r);
 
   assert.equal(json, '{"numerator":"3","denominator":"10"}');
+});
+
+test("toJSON rechaza con InvalidNumberError lo que no es un Rational", () => {
+  for (const value of [123, null, undefined, "3/4", { numerator: "3", denominator: "4" }]) {
+    assert.throws(() => toJSON(value), InvalidNumberError, `value = ${String(value)}`);
+  }
+});
+
+test("fromJSON conserva los errores de validación de Rational.fromJSON", () => {
+  assert.throws(() => fromJSON(null), ParseError);
+  assert.throws(() => fromJSON({ numerator: 3, denominator: 4 }), ParseError); // number, no string
+  assert.throws(() => fromJSON({ numerator: "1.5", denominator: "1" }), ParseError);
+  assert.throws(() => fromJSON({ numerator: "1", denominator: "0" }), DivisionByZeroError);
+});
+
+test("format aplica las reglas de redondeo de toDecimal (half-up, sin '-0')", () => {
+  assert.equal(format(new Rational(1n, 2n), { scale: 0 }), "1");
+  assert.equal(format(new Rational(-1n, 8n), { scale: 2 }), "-0.13");
+  assert.equal(format(new Rational(-1n, 1000n), { scale: 2 }), "0");
 });
 
 test("format usa 5 decimales por defecto y admite scale configurable", () => {

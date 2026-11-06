@@ -42,6 +42,16 @@ test("min y max", () => {
   assert.ok(ExactMath.max(...values).equals(r(9n, 8n)));
 });
 
+test("min y max rechazan una lista vacía", () => {
+  assert.throws(() => ExactMath.min(), InvalidNumberError);
+  assert.throws(() => ExactMath.max(), InvalidNumberError);
+});
+
+test("sum rechaza lo que no es un array de Rational", () => {
+  assert.throws(() => ExactMath.sum([r(1n), 2]), InvalidNumberError);
+  assert.throws(() => ExactMath.sum(null), InvalidNumberError);
+});
+
 test("clamp", () => {
   const min = r(0n);
   const max = r(10n);
@@ -75,6 +85,16 @@ test("weightedAverage", () => {
   // (90*1 + 80*3) / (1+3) = 330/4 = 82.5
   const result = ExactMath.weightedAverage(items);
   assert.equal(result.toDecimal(1), "82.5");
+});
+
+test("weightedAverage es exacto con pesos fraccionarios", () => {
+  // (10 · 1/3 + 20 · 2/3) / (1/3 + 2/3) = 50/3, sin ningún redondeo intermedio.
+  const result = ExactMath.weightedAverage([
+    { value: r(10n), weight: r(1n, 3n) },
+    { value: r(20n), weight: r(2n, 3n) }
+  ]);
+
+  assert.equal(result.toString(), "50/3");
 });
 
 test("weightedAverage lanza si el peso total es cero", () => {
