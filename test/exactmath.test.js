@@ -117,6 +117,25 @@ test("weightedAverage rechaza con InvalidNumberError items que no son objetos", 
   );
 });
 
+test("los wrappers binarios validan ambos operandos y nombran el inválido", () => {
+  // Antes solo validaban `a`; un `b` inválido lo rechazaba el método de Rational con la
+  // etiqueta "other", que no es ningún parámetro de ExactMath.
+  const one = r(1n);
+
+  for (const method of ["add", "subtract", "multiply", "divide", "compare", "equals"]) {
+    assert.throws(
+      () => ExactMath[method](5, one),
+      { name: "InvalidNumberError", message: /^a must be a Rational instance, received number\.$/ },
+      method
+    );
+    assert.throws(
+      () => ExactMath[method](one, 5),
+      { name: "InvalidNumberError", message: /^b must be a Rational instance, received number\.$/ },
+      method
+    );
+  }
+});
+
 test("pow, inverse, abs, negate a través de ExactMath", () => {
   assert.equal(ExactMath.pow(r(2n, 3n), 2).toString(), "4/9");
   assert.equal(ExactMath.inverse(r(3n, 4n)).toString(), "4/3");

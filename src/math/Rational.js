@@ -217,8 +217,17 @@ export class Rational {
    * @param {{numerator: string, denominator: string}} data
    */
   static fromJSON(data) {
-    if (!data || typeof data.numerator !== "string" || typeof data.denominator !== "string") {
-      throw new ParseError("fromJSON() expects { numerator: string, denominator: string }.");
+    const expected = "fromJSON() expects { numerator: string, denominator: string }";
+
+    if (describeType(data) !== "object") {
+      throw new ParseError(`${expected}, received ${describeType(data)}.`);
+    }
+
+    if (typeof data.numerator !== "string" || typeof data.denominator !== "string") {
+      throw new ParseError(
+        `${expected}, received { numerator: ${describeType(data.numerator)}, ` +
+          `denominator: ${describeType(data.denominator)} }.`
+      );
     }
 
     for (const field of /** @type {const} */ (["numerator", "denominator"])) {

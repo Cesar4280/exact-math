@@ -434,6 +434,21 @@ test("fromJSON rechaza con ParseError campos que no son enteros decimales", () =
   }
 });
 
+test("fromJSON dice qué recibió cuando la forma no es válida", () => {
+  const shapeError = (received) => ({
+    name: "ParseError",
+    message: `fromJSON() expects { numerator: string, denominator: string }, received ${received}.`
+  });
+
+  assert.throws(() => Rational.fromJSON(null), shapeError("null"));
+  assert.throws(() => Rational.fromJSON([]), shapeError("array"));
+  assert.throws(() => Rational.fromJSON("3/4"), shapeError("string"));
+  assert.throws(
+    () => Rational.fromJSON({ numerator: 3, denominator: "4" }),
+    shapeError("{ numerator: number, denominator: string }")
+  );
+});
+
 test("fromJSON acepta signos, normaliza, y mantiene DivisionByZeroError si el denominador es 0", () => {
   assert.equal(Rational.fromJSON({ numerator: "-6", denominator: "8" }).toString(), "-3/4");
   assert.equal(Rational.fromJSON({ numerator: "3", denominator: "-4" }).toString(), "-3/4");

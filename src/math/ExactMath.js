@@ -26,6 +26,7 @@ export class ExactMath {
    */
   static add(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.add(b);
   }
 
@@ -36,6 +37,7 @@ export class ExactMath {
    */
   static subtract(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.subtract(b);
   }
 
@@ -46,6 +48,7 @@ export class ExactMath {
    */
   static multiply(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.multiply(b);
   }
 
@@ -56,6 +59,7 @@ export class ExactMath {
    */
   static divide(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.divide(b);
   }
 
@@ -103,6 +107,7 @@ export class ExactMath {
    */
   static compare(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.compare(b);
   }
 
@@ -113,6 +118,7 @@ export class ExactMath {
    */
   static equals(a, b) {
     assertRational(a, "a");
+    assertRational(b, "b");
     return a.equals(b);
   }
 
