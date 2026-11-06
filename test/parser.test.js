@@ -9,6 +9,7 @@ import {
   parseFraction
 } from "../src/math/parser.js";
 import { DivisionByZeroError, ParseError } from "../src/math/errors.js";
+import { Rational } from "../src/math/Rational.js";
 
 test("parseInteger", () => {
   assert.equal(parseInteger("3").toString(), "3/1");
@@ -59,6 +60,22 @@ test("parse auto-detecta el formato", () => {
   assert.equal(parse("3.25").toString(), "13/4");
   assert.equal(parse("25%").toString(), "1/4");
   assert.equal(parse("3/4").toString(), "3/4");
+});
+
+test("parse lee lo que produce toString() también con BigInt enormes", () => {
+  // Complementa el round-trip exhaustivo de rational.test.js, que solo llega a |n| <= 60,
+  // y pasa por parse() en vez de por Rational.fromFraction() directamente.
+  const huge = 10n ** 60n + 7n;
+
+  for (const value of [
+    new Rational(huge, 3n),
+    new Rational(-huge, huge + 2n),
+    new Rational(1n, huge),
+    new Rational(999999999999999999999999n, 7n),
+    new Rational(2n ** 521n - 1n) // primo de Mersenne de 157 dígitos
+  ]) {
+    assert.ok(parse(value.toString()).equals(value), value.toString());
+  }
 });
 
 test("parse ignora los espacios exteriores en todos los formatos", () => {
