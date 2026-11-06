@@ -78,7 +78,11 @@ one place:
   `-3/4`, never `3/-4` or `-3/-4`.
 - **No implicit `Number` coercion** — arithmetic methods require the other operand to already be
   a `Rational` (enforced via `assertRational()`); there is no `add(5)` shorthand. Comparisons
-  (`compare()`/`equals()`) cross-multiply instead of converting either side to a float.
+  (`compare()`/`equals()`) cross-multiply instead of converting either side to a float. JS
+  operators are blocked too: `[Symbol.toPrimitive]` throws `InvalidNumberError` for every numeric
+  or default hint (`a < b`, `a + b`, `a * 2`, `Number(a)`, `"x" + a`), which would otherwise fall
+  back to `toString()` and silently compare or concatenate `"n/d"` strings (`9/1 < 10/1` is
+  `false` lexicographically). Only string contexts (`${a}`, `String(a)`) get `toString()`.
 - **`Number`/`number` only ever appears at the boundary** — `toDecimal()`/`format()` produce a
   _string_, not a `number`, and are the only place rounding happens; nothing upstream of them ever
   calls `Math.round`/`Math.floor`/`Math.ceil`/`parseFloat`/`toFixed`. See the root

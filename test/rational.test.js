@@ -360,6 +360,29 @@ test("acepta los extremos del rango seguro, y valores mayores como bigint o stri
   assert.equal(new Rational("9007199254740993").toString(), "9007199254740993/1");
 });
 
+test("bloquea la coerción implícita: operadores y Number() lanzan InvalidNumberError", () => {
+  const a = new Rational(9n);
+  const b = new Rational(10n);
+
+  // Sin el bloqueo, `a < b` compararía los strings "9/1" y "10/1" (y daría false), y
+  // `a + b` concatenaría "9/110/1".
+  assert.throws(() => a < b, InvalidNumberError);
+  assert.throws(() => a + b, InvalidNumberError);
+  assert.throws(() => a * 2, InvalidNumberError);
+  assert.throws(() => +a, InvalidNumberError);
+  assert.throws(() => Number(a), InvalidNumberError);
+  assert.throws(() => "total: " + a, InvalidNumberError);
+  assert.throws(() => a == "9/1", InvalidNumberError);
+});
+
+test("los contextos de string siguen usando toString()", () => {
+  const r = new Rational(1n, 2n);
+
+  assert.equal(`${r}`, "1/2");
+  assert.equal(String(r), "1/2");
+  assert.equal([r, new Rational(3n)].join(", "), "1/2, 3/1");
+});
+
 test("operaciones exigen instancias de Rational, no números crudos", () => {
   const r = new Rational(1n, 2n);
   assert.throws(() => r.add(2), InvalidNumberError);

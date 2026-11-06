@@ -23,7 +23,8 @@ export class DivisionByZeroError extends ExactMathError {
 /**
  * Raised when a value cannot be treated as an exact integer/BigInt:
  * NaN, Infinity, null, undefined, non-integer numbers, integer numbers beyond
- * ±Number.MAX_SAFE_INTEGER, wrong types.
+ * ±Number.MAX_SAFE_INTEGER, wrong types; and when a Rational is implicitly
+ * coerced by an operator (`<`, `+`, `Number(r)`, ...).
  */
 export class InvalidNumberError extends ExactMathError {}
 

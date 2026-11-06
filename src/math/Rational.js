@@ -501,4 +501,26 @@ export class Rational {
   toJSON() {
     return { numerator: this.#n.toString(), denominator: this.#d.toString() };
   }
+
+  /**
+   * Blocks implicit coercion. Without this, operators fall back to
+   * `toString()` and silently work on `"n/d"` strings:
+   * `new Rational(9n) < new Rational(10n)` is `false` ("9/1" > "10/1"
+   * lexicographically) and `a + b` concatenates. So every numeric or default
+   * hint (`<`, `>`, `+`, `-`, `*`, unary `+`, `Number(r)`, `r == "1/2"`,
+   * `"x" + r`) throws; only string contexts (`${r}`, `String(r)`,
+   * `[r].join()`) get `toString()`.
+   *
+   * @param {string} hint
+   * @returns {string}
+   */
+  [Symbol.toPrimitive](hint) {
+    if (hint === "string") return this.toString();
+
+    throw new InvalidNumberError(
+      "A Rational cannot be implicitly converted to a primitive (operators like <, + and * " +
+        'would silently compare or concatenate "n/d" strings). Use compare()/equals()/add()/... ' +
+        "for math, and toString(), toDecimal() or a template literal for text."
+    );
+  }
 }
