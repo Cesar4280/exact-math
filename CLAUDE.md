@@ -53,3 +53,7 @@ Beyond example-based cases, `test/rational.test.js` includes property-based chec
 fractions verifying commutativity/associativity/distributivity/identities) and large-N stress
 tests (10k–100k chained operations) to catch precision regressions — follow that pattern when
 adding coverage for new operations rather than only testing hand-picked values.
+
+`test/index.test.js` imports the package by its own name (`@cesar4280/exact-math`, resolved
+through `package.json` `exports`) and pins the exact list of public exports. Changing what
+`src/math/index.js` exports makes it fail on purpose: update that list together with the README.
