@@ -49,14 +49,15 @@ Rational.fromInt(1).divide(Rational.fromInt(3)).toRepeatingDecimal(); // "0.(3)"
 
 - **`Rational`** — the core. Immutable, always reduced, denominator always positive.
   `add`/`subtract`/`multiply`/`divide`/`pow`/`inverse`/`abs`/`negate`/`compare`/`equals`, factory
-  methods (`fromInt`, `fromDecimal`, `fromPercentage`, `zero`, `one`, `fromJSON`), and
-  presentation methods (`toDecimal(scale)`, `toRepeatingDecimal()`, `decimalExpansionType()`,
-  `toString()`, `toJSON()`).
+  methods (`fromInt`, `fromDecimal`, `fromPercentage`, `fromFraction`, `zero`, `one`,
+  `fromJSON`), and presentation methods (`toDecimal(scale)`, `toRepeatingDecimal()`,
+  `decimalExpansionType()`, `toString()`, `toJSON()`).
 - **`ExactMath`** — stateless static wrappers for functional-style call sites
   (`ExactMath.average(values)`, `.percentage(part, total)`, `.weightedAverage(items)`, `.clamp`,
   `.min`/`.max`, `.sum`, ...).
-- **`parse` / `parseInteger` / `parseDecimal` / `parsePercentage`** — exact string → `Rational`
-  parsing (`"3.25"` → `13/4`, `"25%"` → `1/4`), never through `parseFloat`.
+- **`parse` / `parseInteger` / `parseDecimal` / `parsePercentage` / `parseFraction`** — exact
+  string → `Rational` parsing (`"3.25"` → `13/4`, `"25%"` → `1/4`, `"3/4"` → `3/4`), never through
+  `parseFloat`. `parse()` detects the format, and reads back what `toString()` writes.
 - **`format(value, { scale })`** — the only sanctioned `Rational` → string presentation path.
 - **`toJSON` / `fromJSON`** — round-trip as `{ numerator: string, denominator: string }`, never as
   a lossy `number`.

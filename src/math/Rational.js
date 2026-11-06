@@ -10,6 +10,9 @@ import {
 /** An optionally signed run of ASCII decimal digits: the only integer-string grammar accepted. */
 const INTEGER_STRING = /^[+-]?\d+$/;
 
+/** Two such integers separated by "/" (whitespace allowed around it), as in "-3/4". */
+const FRACTION_STRING = /^([+-]?\d+)\s*\/\s*([+-]?\d+)$/;
+
 /**
  * Coerces a bigint / safe integer number / integer string into a BigInt,
  * rejecting everything a real-money calculation must never silently accept:
@@ -175,6 +178,31 @@ export class Rational {
 
     const value = Rational.fromDecimal(trimmed.slice(0, -1).trim());
     return value.divide(new Rational(100n));
+  }
+
+  /**
+   * Parses a fraction string, e.g. "3/4" -> 3/4, "-6/8" -> -3/4, "3/-4" -> -3/4.
+   * Reads back exactly what toString() writes, so
+   * `Rational.fromFraction(r.toString())` always equals `r`; also accepts a sign on
+   * either side and whitespace around the "/".
+   *
+   * A zero denominator throws DivisionByZeroError rather than ParseError: the
+   * text is a well-formed fraction, it is the value that does not exist.
+   *
+   * @param {string} text
+   */
+  static fromFraction(text) {
+    if (typeof text !== "string") {
+      throw new ParseError(`fromFraction() expects a string, received ${describeType(text)}.`);
+    }
+
+    const match = FRACTION_STRING.exec(text.trim());
+    if (!match) {
+      throw new ParseError(`"${text}" is not a valid fraction (expected "numerator/denominator").`);
+    }
+
+    const [, numerator, denominator] = match;
+    return new Rational(numerator, denominator);
   }
 
   /**

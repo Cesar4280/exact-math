@@ -332,6 +332,18 @@ test("fromDecimal / fromPercentage según la especificación", () => {
   assert.equal(Rational.fromDecimal("3.25").toString(), "13/4");
   assert.equal(Rational.fromDecimal("0.125").toString(), "1/8");
   assert.equal(Rational.fromPercentage("25%").toString(), "1/4");
+  assert.equal(Rational.fromFraction("6/8").toString(), "3/4");
+});
+
+test("fromFraction lee lo que produce toString(): round-trip exacto (exhaustivo en un rango pequeño)", () => {
+  // Determinista para que un fallo sea siempre reproducible; incluye negativos, cero,
+  // enteros (d = 1) y fracciones sin reducir (que el constructor normaliza).
+  for (let n = -60n; n <= 60n; n++) {
+    for (let d = 1n; d <= 60n; d++) {
+      const value = new Rational(n, d);
+      assert.ok(Rational.fromFraction(value.toString()).equals(value), value.toString());
+    }
+  }
 });
 
 test("rechaza NaN, Infinity, null, undefined y cadenas inválidas", () => {

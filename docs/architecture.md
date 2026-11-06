@@ -37,9 +37,9 @@ reduction step — correct either way, but needlessly larger intermediate BigInt
 Imports are one-way: `parser.js`, `formatter.js`, and `Serializer.js` depend on `Rational.js`, and
 `Rational.js` depends on nothing above it (only `number-theory.js` and `errors.js`). Concretely:
 
-- `parseDecimal()` / `parsePercentage()` in `parser.js` simply call `Rational.fromDecimal()` /
-  `Rational.fromPercentage()` — the actual parsing regex and BigInt arithmetic live as static
-  methods on `Rational`, not in `parser.js`.
+- `parseDecimal()` / `parsePercentage()` / `parseFraction()` in `parser.js` simply call
+  `Rational.fromDecimal()` / `Rational.fromPercentage()` / `Rational.fromFraction()` — the actual
+  parsing regex and BigInt arithmetic live as static methods on `Rational`, not in `parser.js`.
 - `format()` in `formatter.js` calls `Rational#toDecimal()`.
 - `toJSON()`/`fromJSON()` in `Serializer.js` call `Rational#toJSON()` / `Rational.fromJSON()`.
 

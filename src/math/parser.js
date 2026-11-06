@@ -38,8 +38,19 @@ export function parsePercentage(text) {
 }
 
 /**
+ * Parses a fraction string, e.g. "3/4" -> 3/4, "-6/8" -> -3/4. Reads back
+ * exactly what Rational#toString writes.
+ * @param {string} text
+ * @returns {Rational}
+ */
+export function parseFraction(text) {
+  return Rational.fromFraction(text);
+}
+
+/**
  * Auto-detects the format of `text` and parses it: trailing "%" is treated
- * as a percentage, a "." as a decimal, otherwise as a plain integer.
+ * as a percentage, a "/" as a fraction, a "." as a decimal, otherwise as a
+ * plain integer. So `parse(r.toString())` round-trips.
  * @param {string} text
  * @returns {Rational}
  */
@@ -51,6 +62,7 @@ export function parse(text) {
   const trimmed = text.trim();
 
   if (trimmed.endsWith("%")) return parsePercentage(trimmed);
+  if (trimmed.includes("/")) return parseFraction(trimmed);
   if (trimmed.includes(".")) return parseDecimal(trimmed);
 
   return parseInteger(trimmed);

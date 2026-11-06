@@ -1,8 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parse, parseInteger, parseDecimal, parsePercentage } from "../src/math/parser.js";
-import { ParseError } from "../src/math/errors.js";
+import {
+  parse,
+  parseInteger,
+  parseDecimal,
+  parsePercentage,
+  parseFraction
+} from "../src/math/parser.js";
+import { DivisionByZeroError, ParseError } from "../src/math/errors.js";
 
 test("parseInteger", () => {
   assert.equal(parseInteger("3").toString(), "3/1");
@@ -28,8 +34,29 @@ test("parsePercentage", () => {
   assert.throws(() => parsePercentage("25"), ParseError);
 });
 
+test("parseFraction", () => {
+  assert.equal(parseFraction("3/4").toString(), "3/4");
+  assert.equal(parseFraction("-6/8").toString(), "-3/4"); // normaliza
+  assert.equal(parseFraction("3/-4").toString(), "-3/4"); // el signo pasa al numerador
+  assert.equal(parseFraction("+1/+2").toString(), "1/2");
+  assert.equal(parseFraction("  1 / 2  ").toString(), "1/2");
+});
+
+test("parseFraction rechaza con ParseError lo que no es numerador/denominador", () => {
+  for (const text of ["", "3", "3/", "/4", "3/4/5", "3//4", "3.5/2", "1/2.5", "a/b", "0x3/4"]) {
+    assert.throws(() => parseFraction(text), ParseError, `"${text}"`);
+  }
+  assert.throws(() => parseFraction(3), ParseError);
+});
+
+test("parseFraction con denominador cero lanza DivisionByZeroError", () => {
+  // El texto está bien formado; lo que no existe es el valor.
+  assert.throws(() => parseFraction("1/0"), DivisionByZeroError);
+});
+
 test("parse auto-detecta el formato", () => {
   assert.equal(parse("3").toString(), "3/1");
   assert.equal(parse("3.25").toString(), "13/4");
   assert.equal(parse("25%").toString(), "1/4");
+  assert.equal(parse("3/4").toString(), "3/4");
 });
