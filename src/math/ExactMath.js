@@ -219,6 +219,11 @@ export class ExactMath {
 
   /**
    * Clamps `value` to the inclusive [min, max] range.
+   *
+   * Throws when `min > max`: that range is empty, so there is no correct
+   * answer to return (without the check, clamp(5, 10, 0) would yield 10).
+   * `min === max` is a valid one-point range.
+   *
    * @param {Rational} value
    * @param {Rational} min
    * @param {Rational} max
@@ -228,6 +233,10 @@ export class ExactMath {
     assertRational(value, "value");
     assertRational(min, "min");
     assertRational(max, "max");
+
+    if (min.compare(max) > 0) {
+      throw new InvalidNumberError(`clamp() requires min <= max, received min=${min}, max=${max}.`);
+    }
 
     if (value.compare(min) < 0) return min;
     if (value.compare(max) > 0) return max;

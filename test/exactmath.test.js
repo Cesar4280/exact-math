@@ -51,6 +51,21 @@ test("clamp", () => {
   assert.equal(ExactMath.clamp(r(5n), min, max).toString(), "5/1");
 });
 
+test("clamp incluye los extremos y admite min igual a max", () => {
+  const min = r(0n);
+  const max = r(10n);
+
+  assert.ok(ExactMath.clamp(min, min, max).equals(min));
+  assert.ok(ExactMath.clamp(max, min, max).equals(max));
+  assert.ok(ExactMath.clamp(r(7n), r(3n), r(3n)).equals(r(3n)));
+});
+
+test("clamp rechaza con InvalidNumberError límites invertidos (min > max)", () => {
+  // Sin validar, clamp(5, 10, 0) devolvía 10 en silencio.
+  assert.throws(() => ExactMath.clamp(r(5n), r(10n), r(0n)), InvalidNumberError);
+  assert.throws(() => ExactMath.clamp(r(5n), r(1n, 2n), r(1n, 3n)), InvalidNumberError);
+});
+
 test("weightedAverage", () => {
   const items = [
     { value: r(90n), weight: r(1n) },
