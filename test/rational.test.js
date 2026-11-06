@@ -5,6 +5,7 @@ import { Rational } from "../src/math/Rational.js";
 import {
   DivisionByZeroError,
   InvalidNumberError,
+  ParseError,
   PrecisionLimitError
 } from "../src/math/errors.js";
 
@@ -379,6 +380,29 @@ test("fromJSON reconstruye e integra con JSON.stringify/parse", () => {
   const roundTripped = Rational.fromJSON(JSON.parse(JSON.stringify(r)));
 
   assert.ok(roundTripped.equals(r));
+});
+
+test("fromJSON rechaza con ParseError campos que no son enteros decimales", () => {
+  // BigInt() a secas aceptaría "" (-> 0), "0x10" (-> 16), "0b11" u "0o7", y lanzaría un
+  // SyntaxError nativo (fuera de ExactMathError) con "1.5" o "1e3".
+  for (const bad of ["", " ", "0x10", "0b11", "0o7", "1.5", "1e3", "abc", "Infinity", "1_000"]) {
+    assert.throws(
+      () => Rational.fromJSON({ numerator: bad, denominator: "1" }),
+      ParseError,
+      `numerator "${bad}"`
+    );
+    assert.throws(
+      () => Rational.fromJSON({ numerator: "1", denominator: bad }),
+      ParseError,
+      `denominator "${bad}"`
+    );
+  }
+});
+
+test("fromJSON acepta signos, normaliza, y mantiene DivisionByZeroError si el denominador es 0", () => {
+  assert.equal(Rational.fromJSON({ numerator: "-6", denominator: "8" }).toString(), "-3/4");
+  assert.equal(Rational.fromJSON({ numerator: "3", denominator: "-4" }).toString(), "-3/4");
+  assert.throws(() => Rational.fromJSON({ numerator: "1", denominator: "0" }), DivisionByZeroError);
 });
 
 test("propiedades algebraicas: conmutatividad, asociatividad, distributividad, identidades", () => {

@@ -173,13 +173,29 @@ export class Rational {
 
   /**
    * Reconstructs a Rational from `{ numerator, denominator }` (strings).
+   *
+   * Each field must be a decimal integer string (same grammar as the
+   * constructor: optional sign, ASCII digits, surrounding whitespace ignored).
+   * Validated explicitly rather than handed to `BigInt()`, which would accept
+   * `""` as 0 and `"0x10"` as 16, and throw a native `SyntaxError` outside the
+   * `ExactMathError` hierarchy for `"1.5"` or `"1e3"`.
+   *
    * @param {{numerator: string, denominator: string}} data
    */
   static fromJSON(data) {
     if (!data || typeof data.numerator !== "string" || typeof data.denominator !== "string") {
       throw new ParseError("fromJSON() expects { numerator: string, denominator: string }.");
     }
-    return new Rational(BigInt(data.numerator), BigInt(data.denominator));
+
+    for (const field of /** @type {const} */ (["numerator", "denominator"])) {
+      if (!INTEGER_STRING.test(data[field].trim())) {
+        throw new ParseError(
+          `fromJSON() expects ${field} to be an integer string, received "${data[field]}".`
+        );
+      }
+    }
+
+    return new Rational(data.numerator, data.denominator);
   }
 
   // ---- Arithmetic -------------------------------------------------------
