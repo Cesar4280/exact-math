@@ -71,6 +71,17 @@ test("weightedAverage lanza si el peso total es cero", () => {
   assert.throws(() => ExactMath.weightedAverage(items), InvalidNumberError);
 });
 
+test("weightedAverage rechaza con InvalidNumberError items que no son objetos", () => {
+  // Antes, desestructurar null/undefined lanzaba un TypeError nativo fuera de ExactMathError.
+  assert.throws(() => ExactMath.weightedAverage([null]), InvalidNumberError);
+  assert.throws(() => ExactMath.weightedAverage([undefined]), InvalidNumberError);
+  assert.throws(() => ExactMath.weightedAverage([5]), InvalidNumberError);
+  assert.throws(
+    () => ExactMath.weightedAverage([{ value: r(1n), weight: r(1n) }, null]),
+    InvalidNumberError
+  );
+});
+
 test("pow, inverse, abs, negate a través de ExactMath", () => {
   assert.equal(ExactMath.pow(r(2n, 3n), 2).toString(), "4/9");
   assert.equal(ExactMath.inverse(r(3n, 4n)).toString(), "4/3");

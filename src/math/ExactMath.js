@@ -184,9 +184,16 @@ export class ExactMath {
     let weightedSum = Rational.zero();
     let weightTotal = Rational.zero();
 
-    for (const { value, weight } of items) {
-      assertRational(value, "item.value");
-      assertRational(weight, "item.weight");
+    for (const [i, item] of items.entries()) {
+      if (item === null || typeof item !== "object") {
+        throw new InvalidNumberError(
+          `items[${i}] must be a { value, weight } object, received ${item === null ? "null" : typeof item}.`
+        );
+      }
+
+      const { value, weight } = item;
+      assertRational(value, `items[${i}].value`);
+      assertRational(weight, `items[${i}].weight`);
       weightedSum = weightedSum.add(value.multiply(weight));
       weightTotal = weightTotal.add(weight);
     }
