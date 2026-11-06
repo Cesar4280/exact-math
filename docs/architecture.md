@@ -18,7 +18,11 @@ be introduced and drift out of sync. Centralizing in one class means:
   `number`s beyond `±Number.MAX_SAFE_INTEGER` — which may already have been rounded before they
   arrive, so their exact value is unknowable — and requiring operands to already be `Rational`
   instances) happens in one constructor and one `assertRational` helper, so it can't be silently
-  skipped by going through a different entry point.
+  skipped by going through a different entry point. `assertRational` is exported from
+  `Rational.js` and imported by `ExactMath.js`, `formatter.js` and `Serializer.js` instead of
+  each repeating the `instanceof` check, and every error message names the received type through
+  `describeType()` in `errors.js` (which reports `null` and arrays as such, not as `object`).
+  Neither helper is re-exported by `index.js`, so neither is public API.
 
 `number-theory.js` backs both of the library's two size-control optimizations: `multiply()` cross-cancels
 common factors (`gcd(a.n, b.d)`, `gcd(b.n, a.d)`) before multiplying, and `add()`/`subtract()` use

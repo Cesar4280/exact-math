@@ -33,3 +33,19 @@ export class ParseError extends ExactMathError {}
 
 /** Raised when a requested exact representation would exceed a configured size limit. */
 export class PrecisionLimitError extends ExactMathError {}
+
+/**
+ * Names a value's type for error messages: like `typeof`, but reports `"null"`
+ * and `"array"` instead of the `"object"` that `typeof` gives for both.
+ *
+ * Internal helper shared by every module's input validation; not part of the
+ * public API (index.js does not re-export it).
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function describeType(value) {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return "array";
+  return typeof value;
+}

@@ -1,5 +1,4 @@
-import { Rational } from "./Rational.js";
-import { InvalidNumberError } from "./errors.js";
+import { Rational, assertRational } from "./Rational.js";
 
 /**
  * Serializes a Rational to a plain object with string fields, safe for
@@ -10,9 +9,8 @@ import { InvalidNumberError } from "./errors.js";
  * @returns {{ numerator: string, denominator: string }}
  */
 export function toJSON(rational) {
-  if (!(rational instanceof Rational)) {
-    throw new InvalidNumberError(`toJSON() expects a Rational, received ${typeof rational}.`);
-  }
+  assertRational(rational, "toJSON() argument");
+
   return rational.toJSON();
 }
 

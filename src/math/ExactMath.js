@@ -1,17 +1,5 @@
-import { Rational } from "./Rational.js";
-import { InvalidNumberError } from "./errors.js";
-
-/**
- * @param {unknown} value
- * @param {string} paramName
- */
-function assertRational(value, paramName) {
-  if (!(value instanceof Rational)) {
-    throw new InvalidNumberError(
-      `${paramName} must be a Rational instance, received ${value === null ? "null" : typeof value}.`
-    );
-  }
-}
+import { Rational, assertRational } from "./Rational.js";
+import { InvalidNumberError, describeType } from "./errors.js";
 
 /**
  * @param {unknown} values
@@ -153,7 +141,7 @@ export class ExactMath {
    */
   static sum(values) {
     if (!Array.isArray(values)) {
-      throw new InvalidNumberError(`sum() expects an array, received ${typeof values}.`);
+      throw new InvalidNumberError(`sum() expects an array, received ${describeType(values)}.`);
     }
     values.forEach((v, i) => assertRational(v, `values[${i}]`));
     return values.reduce((a, b) => a.add(b), Rational.zero());
@@ -187,7 +175,7 @@ export class ExactMath {
     for (const [i, item] of items.entries()) {
       if (item === null || typeof item !== "object") {
         throw new InvalidNumberError(
-          `items[${i}] must be a { value, weight } object, received ${item === null ? "null" : typeof item}.`
+          `items[${i}] must be a { value, weight } object, received ${describeType(item)}.`
         );
       }
 

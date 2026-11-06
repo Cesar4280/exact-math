@@ -1,5 +1,4 @@
-import { Rational } from "./Rational.js";
-import { InvalidNumberError } from "./errors.js";
+import { Rational, assertRational } from "./Rational.js";
 
 /**
  * The only sanctioned way to turn a Rational into user-facing text.
@@ -10,9 +9,7 @@ import { InvalidNumberError } from "./errors.js";
  * @returns {string}
  */
 export function format(value, { scale = 5 } = {}) {
-  if (!(value instanceof Rational)) {
-    throw new InvalidNumberError(`format() expects a Rational, received ${typeof value}.`);
-  }
+  assertRational(value, "format() value");
 
   return value.toDecimal(scale);
 }

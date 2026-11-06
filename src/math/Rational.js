@@ -3,7 +3,8 @@ import {
   DivisionByZeroError,
   InvalidNumberError,
   ParseError,
-  PrecisionLimitError
+  PrecisionLimitError,
+  describeType
 } from "./errors.js";
 
 /** An optionally signed run of ASCII decimal digits: the only integer-string grammar accepted. */
@@ -45,19 +46,24 @@ function toBigInt(value, label) {
   }
 
   throw new InvalidNumberError(
-    `${label} must be a bigint, integer number, or integer string; received ${value === null ? "null" : typeof value}.`
+    `${label} must be a bigint, integer number, or integer string; received ${describeType(value)}.`
   );
 }
 
 /**
  * Throws unless `value` is a Rational instance. Keeps operator semantics unambiguous.
+ *
+ * The single definition of this check: the adapter modules (ExactMath,
+ * formatter, Serializer) import it from here rather than repeating the
+ * `instanceof` test. Not part of the public API (index.js does not re-export it).
+ *
  * @param {unknown} value
- * @param {string} paramName
+ * @param {string} paramName used in the error message
  */
-function assertRational(value, paramName) {
+export function assertRational(value, paramName) {
   if (!(value instanceof Rational)) {
     throw new InvalidNumberError(
-      `${paramName} must be a Rational instance, received ${value === null ? "null" : typeof value}.`
+      `${paramName} must be a Rational instance, received ${describeType(value)}.`
     );
   }
 }
@@ -131,7 +137,7 @@ export class Rational {
    */
   static fromDecimal(text) {
     if (typeof text !== "string") {
-      throw new ParseError(`fromDecimal() expects a string, received ${typeof text}.`);
+      throw new ParseError(`fromDecimal() expects a string, received ${describeType(text)}.`);
     }
 
     const trimmed = text.trim();
@@ -159,7 +165,7 @@ export class Rational {
    */
   static fromPercentage(text) {
     if (typeof text !== "string") {
-      throw new ParseError(`fromPercentage() expects a string, received ${typeof text}.`);
+      throw new ParseError(`fromPercentage() expects a string, received ${describeType(text)}.`);
     }
 
     const trimmed = text.trim();

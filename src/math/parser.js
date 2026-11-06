@@ -1,5 +1,5 @@
 import { Rational } from "./Rational.js";
-import { ParseError } from "./errors.js";
+import { ParseError, describeType } from "./errors.js";
 
 /**
  * Parses a plain integer string, e.g. "3" -> 3/1, "-7" -> -7/1.
@@ -8,7 +8,7 @@ import { ParseError } from "./errors.js";
  */
 export function parseInteger(text) {
   if (typeof text !== "string") {
-    throw new ParseError(`parseInteger() expects a string, received ${typeof text}.`);
+    throw new ParseError(`parseInteger() expects a string, received ${describeType(text)}.`);
   }
 
   const trimmed = text.trim();
@@ -45,7 +45,7 @@ export function parsePercentage(text) {
  */
 export function parse(text) {
   if (typeof text !== "string") {
-    throw new ParseError(`parse() expects a string, received ${typeof text}.`);
+    throw new ParseError(`parse() expects a string, received ${describeType(text)}.`);
   }
 
   const trimmed = text.trim();
